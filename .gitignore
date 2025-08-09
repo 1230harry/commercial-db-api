@@ -138,3 +138,17 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+# Vite cache directory
+.vite
+# Vite build output
+dist   
+# Vite dev server output
+.vite-dev-server
+# Vite plugin cache
+.vite-plugin-cache
+# Vite test cache
+.vitest
+# Vite test output
+.vitest-output
+# Vite test coverage
+.vitest-coverage
