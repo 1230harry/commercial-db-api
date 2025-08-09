@@ -3,6 +3,14 @@ const express = require('express');
 const ordersRouter = require('./routes/orders');
 const productsRouter = require('./routes/products');
 const customersRouter = require('./routes/customers');
+const addressesRouter = require('./routes/addresses');
+const categoriesRouter = require('./routes/categories');
+const suppliersRouter = require('./routes/suppliers');
+const inventoryRouter = require('./routes/inventory');
+const order_itemsRouter = require('./routes/orderItems');
+const paymentsRouter = require('./routes/payments');
+const warehousesRouter = require('./routes/warehouses');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +44,13 @@ app.get('/', (req, res) => {
 app.use('/api/orders', ordersRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/customers', customersRouter);
+app.use('/api/addresses', addressesRouter);
+app.use('/api/categories', categoriesRouter);
+app.use('/api/suppliers', suppliersRouter);
+app.use('/api/inventory', inventoryRouter);
+app.use('/api/order-items', order_itemsRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/warehouses', warehousesRouter);
 
 // Start the server
 app.listen(PORT, () => {
