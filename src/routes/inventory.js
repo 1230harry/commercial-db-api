@@ -84,4 +84,74 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// New route to get all inventory records with product and warehouse names
+// GET /api/inventory/full-details
+router.get('/full-details', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT
+        i.id, i.quantity,
+        p.name AS product_name, p.sku AS product_sku,
+        w.name AS warehouse_name, w.location AS warehouse_location
+      FROM inventory i
+      INNER JOIN products p ON i.product_id = p.id
+      INNER JOIN warehouses w ON i.warehouse_id = w.id`
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching inventory with full details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// New route to get all inventory records with product and warehouse names
+// Now supports filtering and pagination
+// GET /api/inventory/full-details?page=<number>&limit=<number>&product_name=<string>
+router.get('/full-details', async (req, res) => {
+  try {
+    const { page, limit, product_name } = req.query;
+
+    // --- Pagination Logic ---
+    // Set defaults if not provided
+    const pageNumber = parseInt(page) || 1;
+    const pageSize = parseInt(limit) || 10;
+    const offset = (pageNumber - 1) * pageSize;
+
+    // --- Filtering Logic ---
+    const filters = [];
+    const params = [];
+    if (product_name) {
+      filters.push('p.name LIKE ?');
+      // The '%' is a wildcard for partial matching
+      params.push(`%${product_name}%`);
+    }
+
+    // Build the SQL query dynamically
+    let sqlQuery = `
+      SELECT
+        i.id, i.quantity,
+        p.name AS product_name, p.sku AS product_sku,
+        w.name AS warehouse_name, w.location AS warehouse_location
+      FROM inventory i
+      INNER JOIN products p ON i.product_id = p.id
+      INNER JOIN warehouses w ON i.warehouse_id = w.id
+    `;
+
+    if (filters.length > 0) {
+      sqlQuery += ' WHERE ' + filters.join(' AND ');
+    }
+    
+    // Add pagination to the query
+    sqlQuery += ` LIMIT ? OFFSET ?`;
+    params.push(pageSize, offset);
+
+    const [rows] = await db.query(sqlQuery, params);
+    res.status(200).json(rows);
+
+  } catch (error) {
+    console.error('Error fetching inventory with full details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;

@@ -78,4 +78,24 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// New route to get all products with category and supplier details
+// GET /api/products/full-details
+router.get('/full-details', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT
+        p.id, p.sku, p.name, p.description, p.price, p.cost,
+        c.name AS category_name,
+        s.name AS supplier_name
+      FROM products p
+      INNER JOIN categories c ON p.category_id = c.id
+      INNER JOIN suppliers s ON p.supplier_id = s.id`
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching products with full details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;

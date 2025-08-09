@@ -94,4 +94,23 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// New route to get all orders with customer details
+// GET /api/orders/full-details
+router.get('/full-details', async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT
+        o.id, o.order_date, o.status, o.total,
+        c.first_name, c.last_name, c.email
+      FROM orders o
+      INNER JOIN customers c ON o.customer_id = c.id
+      ORDER BY o.order_date DESC`
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching orders with customer details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;

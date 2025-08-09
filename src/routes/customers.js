@@ -78,4 +78,34 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Joining Customers and Addresses (Inner Join)
+// Route to get a single customer with their shipping and billing addresses
+// GET /api/customers/:id/full-details
+router.get('/:id/full-details', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query(
+      `SELECT
+        c.id, c.first_name, c.last_name, c.email,
+        s_addr.street AS shipping_street, s_addr.city AS shipping_city, s_addr.state AS shipping_state,
+        b_addr.street AS billing_street, b_addr.city AS billing_city, b_addr.state AS billing_state
+      FROM customers c
+      INNER JOIN addresses s_addr ON c.shipping_address_id = s_addr.id
+      INNER JOIN addresses b_addr ON c.billing_address_id = b_addr.id
+      WHERE c.id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Customer with addresses not found' });
+    }
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error('Error fetching customer with addresses:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 module.exports = router;
