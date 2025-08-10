@@ -45,9 +45,30 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// LOGOUT (client should delete token)
+router.post('/logout', verifyToken, (req, res) => {
+    // Since JWT is stateless, just tell client to delete token
+    res.json({ message: 'Logged out successfully. Please delete your token on client.' });
+});
+
 // ADMIN-ONLY ROUTE
-router.get('/admin-dashboard', verifyToken, isAdmin, (req, res) => {
-    res.json({ message: 'Welcome to the Admin Dashboard', user: req.user });
+// router.get('/admin-dashboard', verifyToken, isAdmin, (req, res) => {
+//     res.json({ message: 'Welcome to the Admin Dashboard', user: req.user });
+// });
+
+
+// DASHBOARD route - for both admin and normal user
+router.get('/dashboard', verifyToken, (req, res) => {
+    if (req.user.admin) {
+        // Admin dashboard response
+        res.json({ message: 'Welcome to the Admin Dashboard', user: req.user });
+    } else {
+        // Normal user dashboard response
+        res.json({ message: 'Welcome to the User Dashboard', user: req.user });
+    }   
 });
 
 module.exports = router;
+
+
+
