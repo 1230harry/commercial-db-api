@@ -1,4 +1,5 @@
 // src/app.js
+const usersRouter = require('./routes/users');
 const express = require('express');
 const ordersRouter = require('./routes/orders');
 const productsRouter = require('./routes/products');
@@ -10,7 +11,6 @@ const inventoryRouter = require('./routes/inventory');
 const order_itemsRouter = require('./routes/orderItems');
 const paymentsRouter = require('./routes/payments');
 const warehousesRouter = require('./routes/warehouses');
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +42,7 @@ app.get('/', (req, res) => {
 });
 
 // Use the routers for their respective routes
+app.use('/api/users', usersRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/customers', customersRouter);
